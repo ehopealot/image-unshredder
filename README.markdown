@@ -16,6 +16,8 @@ to shred your own image, run:
 
 `python shredder.py -f <filename> --shreds <number of shreds (default 20)>`
 
+This definitely works best if the number of shreds is a divisor of the width of the images in pixels
+
 and to unshred that image, run:
 
 `python unshredder.py -f <filename>`
