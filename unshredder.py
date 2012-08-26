@@ -34,7 +34,7 @@ class Shred(object):
         pixel = self.data[y * width + x]
         return pixel        
 
-    def get_grayscale(self, red, green, blue, alpha):
+    def get_grayscale(self, red, green, blue, *args):
         return .11*blue + .59*green + .30 * red
 
     def compare(self, my_edge, other_edge):
@@ -45,11 +45,11 @@ class Shred(object):
             other_pixel_gray = self.get_grayscale(*other_pixel)
             pixels = zip(pixel, other_pixel)
             similar = True
-            for index, value in enumerate(pixel):
-                if abs(value - other_pixel[index]) > 10:
-                    similar = False
-                    break
-            score += 1 if similar else 0
+            for value in pixels:
+                if abs(value[0]-value[1]) > 10:
+                    score -= 1
+                    
+
                 
 
         return score
@@ -79,7 +79,9 @@ class Unshredder(object):
     def __init__(self, image_name):
         self.image = Image.open(image_name)
         self.data = self.image.getdata()
-        self.shreds = []                       
+        self.shreds = [] 
+        global SHRED_WIDTH
+        SHRED_WIDTH = self.image.size[0]/NUMBER_SHREDS
         x1, y1, x2, y2 = 0, 0, SHRED_WIDTH, self.image.size[1]
         for i in range(NUMBER_SHREDS):
             region = Region(x1, y1, x2, y2)
@@ -87,6 +89,7 @@ class Unshredder(object):
             x1 += SHRED_WIDTH
             x2 += SHRED_WIDTH
     
+
     def solve(self):
         for index, shred in enumerate(self.shreds):
             for shred2 in self.shreds[index+1:]:
@@ -105,8 +108,14 @@ class Unshredder(object):
         unshredded.paste(source_region, destination_point)
         shreds_pasted = 1
         last_shred = left
+        working_shreds = set(self.shreds)
         while shreds_pasted < NUMBER_SHREDS:
-            next_shred = last_shred.closest_right_score()[1]
+            working_shreds.remove(last_shred)
+            scores = []
+            for shred in working_shreds:
+                scores.append((shred, last_shred.compare_right(shred)))
+            next_shred = max(scores,key=lambda item:item[1])[0]
+            #next_shred = last_shred.closest_right_score()[1]
             x1 = next_shred.id * SHRED_WIDTH
             x2 += x1 + SHRED_WIDTH
             destination_point = (destination_point[0]+SHRED_WIDTH, 0)
@@ -118,7 +127,12 @@ class Unshredder(object):
         unshredded.save("unshredded.jpg", "JPEG")
 
 def run():
-    unshredder = Unshredder('TokyoPanoramaShredded.png')
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f',default='TokyoPanoramaShredded.png')
+    args = parser.parse_args()
+    filename = args.f
+    unshredder = Unshredder(filename)
     unshredder.solve()
     
 
