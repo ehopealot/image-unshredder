@@ -90,7 +90,7 @@ class Unshredder(object):
                             guesses[x%max_x] = 1
                         break
                 last = next
-        print sorted(guesses.items(), key=lambda x: -x[1])
+#        print sorted(guesses.items(), key=lambda x: -x[1])
         return max(guesses.items(),key=lambda x: x[1])[0]
 
     def __init__(self, image_name, num_shreds = None):
@@ -106,7 +106,7 @@ class Unshredder(object):
         else:
             SHRED_WIDTH = self.compute_shred_width()
             NUMBER_SHREDS = self.image.size[0]/SHRED_WIDTH
-        print SHRED_WIDTH, NUMBER_SHREDS
+        print "Guessing there are {0} shreds each {1} pixels wide. If this is wrong you can give a hint with the -s option!".format(NUMBER_SHREDS, SHRED_WIDTH)
 #        SHRED_WIDTH = self.image.size[0]/NUMBER_SHREDS
         x1, y1, x2, y2 = 0, 0, SHRED_WIDTH, self.image.size[1]
         for i in range(NUMBER_SHREDS):
