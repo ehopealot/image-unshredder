@@ -1,0 +1,3 @@
+Make sure you have PIL installed, then run python unshredder.py
+
+Right now it just has the Tokyo Panorama Skyline filename hard coded into the source, but that is easy to change
