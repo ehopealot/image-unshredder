@@ -6,15 +6,21 @@ From the challenge posted here on the instagram engineering blog: http://instagr
 
 Make sure you have PIL installed
 
-to shred an image, run:
+To see a demonstration, running 
+
+`python unshredder.py` 
+
+will unshred the TokyoPanoramaShredded.png image file included in the repo and save the output to a file called unshredded.jpg
+
+to shred your own image, run:
 
 `python shredder.py -f <filename> --shreds <number of shreds (default 20)>`
 
-to unshred an image, run:
+and to unshred that image, run:
 
 `python unshredder.py -f <filename>`
 
-which outputs the unshredded image to unshredded.jpg
+which outputs the unshredded image to unshredded.jpg. If you don't specify a filename then the script looks for a file called TokyoPanoramaUnshredded.png
 
 if the unshredder is having a hard time discovering the correct shred width, the -s option allows you to tell it how many shreds there are:
 
