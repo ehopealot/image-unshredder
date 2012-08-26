@@ -4,3 +4,4 @@ venv
 .DS_STORE
 unshredded.jpg
 *.jpeg
+*.png

@@ -90,18 +90,23 @@ class Unshredder(object):
                             guesses[x%max_x] = 1
                         break
                 last = next
-#        print sorted(guesses.items(), key=lambda x: -x[1])
+        print sorted(guesses.items(), key=lambda x: -x[1])
         return max(guesses.items(),key=lambda x: x[1])[0]
 
-    def __init__(self, image_name):
+    def __init__(self, image_name, num_shreds = None):
         self.image = Image.open(image_name)
         self.data = self.image.getdata()
         self.shreds = [] 
 
         global SHRED_WIDTH
-        SHRED_WIDTH = self.compute_shred_width()
         global NUMBER_SHREDS
-        NUMBER_SHREDS = self.image.size[0]/SHRED_WIDTH
+        if num_shreds:
+            NUMBER_SHREDS = num_shreds
+            SHRED_WIDTH = self.image.size[0]/NUMBER_SHREDS
+        else:
+            SHRED_WIDTH = self.compute_shred_width()
+            NUMBER_SHREDS = self.image.size[0]/SHRED_WIDTH
+        print SHRED_WIDTH, NUMBER_SHREDS
 #        SHRED_WIDTH = self.image.size[0]/NUMBER_SHREDS
         x1, y1, x2, y2 = 0, 0, SHRED_WIDTH, self.image.size[1]
         for i in range(NUMBER_SHREDS):
@@ -151,9 +156,10 @@ def run():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('-f',default='TokyoPanoramaShredded.png')
+    parser.add_argument('-s',default=None,type=int)
     args = parser.parse_args()
     filename = args.f
-    unshredder = Unshredder(filename)
+    unshredder = Unshredder(filename,args.s)
     unshredder.solve()
     
 
