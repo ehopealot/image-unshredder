@@ -34,15 +34,10 @@ class Shred(object):
         pixel = self.data[y * width + x]
         return pixel        
 
-    def get_grayscale(self, red, green, blue, *args):
-        return .11*blue + .59*green + .30 * red
-
     def compare(self, my_edge, other_edge):
         score = 0
         for index, pixel in enumerate(my_edge):
             other_pixel = other_edge[index]
-            my_pixel_gray = self.get_grayscale(*pixel)
-            other_pixel_gray = self.get_grayscale(*other_pixel)
             pixels = zip(pixel, other_pixel)
             similar = True
             for value in pixels:
@@ -76,12 +71,38 @@ class Shred(object):
         return sum(self.right_scores.keys())
 
 class Unshredder(object):
+    def compute_shred_width(self):
+        import math
+        max_y = self.image.size[1]
+        max_x = self.image.size[0]
+        min_x = 0
+        guesses = {}
+        for y in range(max_y):
+            last = None
+            for x in range(y*max_x, y*max_x+int(max_x/2)): 
+                next = self.data[x]
+                if last:
+                    diff = math.sqrt((last[0]-next[0])**2+(last[1]-next[1])**2+(last[2]-next[2])**2)
+                    if diff > 150:
+                        if x%max_x in guesses:
+                            guesses[x%max_x] += 1
+                        else:
+                            guesses[x%max_x] = 1
+                        break
+                last = next
+#        print sorted(guesses.items(), key=lambda x: -x[1])
+        return max(guesses.items(),key=lambda x: x[1])[0]
+
     def __init__(self, image_name):
         self.image = Image.open(image_name)
         self.data = self.image.getdata()
         self.shreds = [] 
+
         global SHRED_WIDTH
-        SHRED_WIDTH = self.image.size[0]/NUMBER_SHREDS
+        SHRED_WIDTH = self.compute_shred_width()
+        global NUMBER_SHREDS
+        NUMBER_SHREDS = self.image.size[0]/SHRED_WIDTH
+#        SHRED_WIDTH = self.image.size[0]/NUMBER_SHREDS
         x1, y1, x2, y2 = 0, 0, SHRED_WIDTH, self.image.size[1]
         for i in range(NUMBER_SHREDS):
             region = Region(x1, y1, x2, y2)

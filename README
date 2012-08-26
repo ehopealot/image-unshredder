@@ -1,3 +1,11 @@
 Make sure you have PIL installed, then run python unshredder.py
 
-Right now it just has the Tokyo Panorama Skyline filename hard coded into the source, but that is easy to change
+to shred an image, run:
+
+python shredder.py -f <filename> --shreds <number of shreds (default 20)>
+
+to unshred an image, run 
+
+python unshredder.py -f <filename>
+
+which outputs the unshredded image to unshredded.jpg

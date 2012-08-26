@@ -6,11 +6,11 @@ import os.path
 
 parser = argparse.ArgumentParser(description='Shred an image')
 parser.add_argument('--shreds', default=20, type=int)
-parser.add_argument('--filename', default='sample.png')
+parser.add_argument('-f', default='sample.png')
 args = parser.parse_args()
 
 SHREDS = args.shreds
-filename = args.filename
+filename = args.f
 
 
 image = Image.open(filename)
