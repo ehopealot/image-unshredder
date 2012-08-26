@@ -43,10 +43,6 @@ class Shred(object):
             for value in pixels:
                 if abs(value[0]-value[1]) > 10:
                     score -= 1
-                    
-
-                
-
         return score
 
     def compare_left(self, other_shred):
@@ -117,6 +113,7 @@ class Unshredder(object):
     
 
     def solve(self):
+        scores = {}
         for index, shred in enumerate(self.shreds):
             for shred2 in self.shreds[index+1:]:
                 left_score = shred.compare_left(shred2)
@@ -125,6 +122,8 @@ class Unshredder(object):
                 shred.right_scores[right_score] = shred2
                 shred2.left_scores[right_score] = shred
                 shred2.right_scores[left_score] = shred
+                scores[(shred2, shred)] = left_score
+                scores[(shred, shred2)] = right_score
         left = min(self.shreds, key=lambda shred:shred.closest_left_score()[0])
         right = min(self.shreds, key=lambda shred:shred.closest_right_score()[0])
         unshredded = Image.new("RGBA", self.image.size)
@@ -135,13 +134,13 @@ class Unshredder(object):
         shreds_pasted = 1
         last_shred = left
         working_shreds = set(self.shreds)
+
         while shreds_pasted < NUMBER_SHREDS:
             working_shreds.remove(last_shred)
-            scores = []
-            for shred in working_shreds:
-                scores.append((shred, last_shred.compare_right(shred)))
-            next_shred = max(scores,key=lambda item:item[1])[0]
-            #next_shred = last_shred.closest_right_score()[1]
+            relevant_scores = [(shred, scores[(last_shred, shred)]) for shred in working_shreds]
+#            for shred in working_shreds:
+#                relevant_scores.append((shred,scores[(last_shred, shred)]))      
+            next_shred = max(relevant_scores,key=lambda item:item[1])[0]
             x1 = next_shred.id * SHRED_WIDTH
             x2 += x1 + SHRED_WIDTH
             destination_point = (destination_point[0]+SHRED_WIDTH, 0)
